@@ -3,69 +3,84 @@
 using System.Net.Mime;
 using ConsoleApp7;
 
-var display = new DisplayHangman();
-Console.WriteLine("\n Velkommen til Hangman! \n______________________________________ \n");
-string currentWord = "hangman";
-string displayWord = new string('*', currentWord.Length);
-int guesses = 0;
 
-int antallBokstaver = currentWord.Length;
-Console.WriteLine($"Ordet vi skal frem til inneholder {antallBokstaver} bokstaver.\n");
+Run();
 
 
-while (displayWord != currentWord)
+string CurrentWord(out string displayWord1, out int guesses1, out int antallBokstaver1)
 {
-    Run();
+    var AddWords = new WordLibrary();
+    string s = AddWords.RandomWord();
+    displayWord1 = new string('*', s.Length);
+    guesses1 = 0;
+    antallBokstaver1 = s.Length;
+    return s;
 }
-Console.WriteLine("Gratulerer du vant!");
-
 
 void Run()
 {
-    Console.WriteLine(displayWord);
-    var input = Console.ReadLine()[0];
-    
-  
-    
-    for (int i = 0; i < currentWord.Length; i++)
+    var display = new DisplayHangman();
+    var currentWord = CurrentWord(out var displayWord, out var guesses, out var antallBokstaver);
+    WelcomeToHangman(antallBokstaver);
+    while (displayWord != currentWord && guesses <= 6)
     {
-        if (input == currentWord[i])
-        {
-            displayWord = displayWord.Substring(0, i) + input + displayWord.Substring(i + 1);
-           
-        } 
-
+        HangmanGame();
     }
-    Console.SetCursorPosition(0, 6);
 
+    GameOver();
 
-}
-/*
-void Run()
-{
-
-    var input = Console.ReadLine()[0];
-    Console.WriteLine(displayWord);
-    bool correctGuess = false;
-
-    for (int i = 0; i < currentWord.Length; i++)
+    void WelcomeToHangman(int antallBokstaver2)
     {
-        if (input == currentWord[i])
+        Console.WriteLine("\n Velkommen til Hangman! \n______________________________________ \n");
+        Console.WriteLine($"Ordet vi skal frem til inneholder {antallBokstaver2} bokstaver.\n");
+    }
+
+    void HangmanGame()
+    {
+        Console.WriteLine(displayWord);
+
+        bool correctWord = false;
+        var input = Console.ReadLine()[0];
+        display.Show(guesses);
+        for (int i = 0; i < currentWord.Length; i++)
         {
-            displayWord = displayWord.Substring(0, i) + input + displayWord.Substring(i + 1);
-            correctGuess = true;
+            if (input == currentWord[i])
+            {
+                correctWord = true;
+                displayWord = displayWord.Substring(0, i) + input + displayWord.Substring(i + 1);
+            }
         }
 
+        if (!correctWord)
+        {
+            guesses++;
+        }
+
+        Console.SetCursorPosition(0, 6);
     }
 
-    if (!correctGuess)
+    void GameOver()
     {
-        guesses++;
-        Console.WriteLine(guesses);
-    }
-    display.Show(guesses);
-    Console.SetCursorPosition(0, 6);
+        if (displayWord == currentWord)
+        {
+            Console.WriteLine($"Gratulerer du vant! Ordet var {currentWord}");
+        }
+        else
+        {
+            Console.WriteLine("You cannot escape death!");
+        }
 
+        Console.ReadKey();
+        Console.Clear();
+        Console.WriteLine("Do you want to play again? Type 'yes' to play again!");
+        string PlayAgainRespone = Console.ReadLine();
+        if (PlayAgainRespone == "yes")
+        {
+            Console.Clear();
+            Run();
+        }
+    }
 }
 
-*/
+
+
